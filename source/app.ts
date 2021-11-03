@@ -1,7 +1,6 @@
 import express, {Express} from 'express';
 import routes from "./routes/courses";
-import * as fs from 'fs';
-import * as https from "https";
+import * as http from 'http';
 import {sequelize} from "./backend/connection-pg";
 
 sequelize.sync({alter: true, force: true}).then();
@@ -9,12 +8,6 @@ sequelize.sync({alter: true, force: true}).then();
 process.env.domain = "https://jhordycg.westeurope.cloudapp.azure.com:8443";
 
 const router: Express = express();
-const CERT_DIR: string = "source/src";
-
-const HTTPS_OPTIONS = {
-    key: fs.readFileSync(`${CERT_DIR}/privkey.pem`),
-    cert: fs.readFileSync(`${CERT_DIR}/cert.pem`),
-}
 
 /** Logging */
 /** Parse the request */
@@ -48,6 +41,6 @@ router.use((req, res, next) => {
 });
 
 /** Server */
-const httpServer = https.createServer(HTTPS_OPTIONS, router);
+const httpServer = http.createServer(router);
 const PORT: any = process.env.PORT ?? 8443;
 httpServer.listen(PORT, () => console.log(`The server is running on port ${PORT}`));
