@@ -1,23 +1,24 @@
-import express, { Express } from 'express';
+import express, {Express} from 'express';
 import routes from "./routes/courses";
 import * as fs from 'fs';
 import * as https from "https";
+import {sequelize} from "./backend/connection-pg";
+
+sequelize.sync({alter: true, force: true}).then();
 
 process.env.domain = "https://jhordycg.westeurope.cloudapp.azure.com:8443";
-const router: Express = express();
-let HTTPS_OPTIONS = {}
 
-console.log()
+const router: Express = express();
 const CERT_DIR: string = "source/src";
 
-HTTPS_OPTIONS = {
+const HTTPS_OPTIONS = {
     key: fs.readFileSync(`${CERT_DIR}/privkey.pem`),
     cert: fs.readFileSync(`${CERT_DIR}/cert.pem`),
 }
 
 /** Logging */
 /** Parse the request */
-router.use(express.urlencoded({ extended: false }));
+router.use(express.urlencoded({extended: false}));
 /** Takes care of JSON data */
 router.use(express.json());
 

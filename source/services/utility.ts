@@ -1,39 +1,28 @@
-import { Request } from "express";
-import { ZoomParticipant } from "../class/ZoomMeeting";
+import {Request} from "express";
+import {ZoomParticipant} from "../class/ZoomMeeting";
+import {ParticipantModelI} from "../backend/db.model";
 
-export function mergeStudents(list: ZoomParticipant[]): ZoomParticipant[] {
+export function mergeStudents(list: ParticipantModelI[]): ParticipantModelI[] {
     let zoomParticipants;
 
-    const participants = list.reduce<Map<string, ZoomParticipant[]>>(
+    const participants = list.reduce<Map<string, ParticipantModelI[]>>(
         (result, item) => {
             if (result.get(item.name)) result.get(item.name)?.push(item)
             result.set(item.name, [item]);
             return result;
-        }, new Map<string, ZoomParticipant[]>()
+        }, new Map<string, ParticipantModelI[]>()
     );
-
     zoomParticipants = mergeStudent(participants);
-
-    if (zoomParticipants.length < 1) {
-        zoomParticipants.push({
-            duration: 30,
-            name: 'hola',
-            join_time: '25436234',
-            leave_time: '24523452',
-            user_id: 'sdasdfj'
-        })
-    }
-
-    return zoomParticipants.sort(({ name: a }, { name: b }) => a.localeCompare(b));
+    return zoomParticipants.sort(({name: a}, {name: b}) => a.localeCompare(b));
 }
 
-function mergeStudent(studentMap: Map<string, ZoomParticipant[]>) {
-    let result = new Array<ZoomParticipant>();
+function mergeStudent(studentMap: Map<string, ParticipantModelI[]>) {
+    let result = new Array<ParticipantModelI>();
     studentMap.forEach((students) => {
         if (students.length == 1) result.push(students[0]);
 
         else {
-            const studentMergeds = students.reduce<ZoomParticipant[]>(
+            const studentMergeds = students.reduce<ParticipantModelI[]>(
                 (mergeds, item) => {
                     if (mergeds.length) return ([item]);
                     let prev
@@ -55,7 +44,7 @@ function mergeStudent(studentMap: Map<string, ZoomParticipant[]>) {
     return result;
 }
 
-function merge([prev, curr]: ZoomParticipant[], tolerance: number = 0) {
+function merge([prev, curr]: ParticipantModelI[]) {
     if (curr.join_time <= prev.leave_time) {
         let result = curr;
         result.join_time = prev.join_time > curr.leave_time ? prev.join_time : curr.leave_time;
@@ -77,6 +66,7 @@ export function hasParams(req: Request): boolean {
 interface DefaultParams {
     grid_item_identifier: string;
 }
+
 export function getParams(req: Request) {
     return {
         others: {

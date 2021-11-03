@@ -1,11 +1,12 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { ZoomMeeting, ZoomParticipant } from '../class/ZoomMeeting';
+import axios, {AxiosRequestConfig} from 'axios';
+import {ZoomMeeting, ZoomParticipant} from '../class/ZoomMeeting';
+import {parseToParticipantModelI, ParticipantModelI} from "./db.model";
 
 const ZOOM_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOm51bGwsImlzcyI6Ik5HZzVUMGtCUUdhV3Z2eXdfOHVfMFEiLCJleHAiOjE2NDAwNDQ3NDAsImlhdCI6MTYzNDU5NjIxM30.CLnxK73W_pdfwrra1VdQ1hD3IbXLmJH_VP_6et3eli8';
 const PREFIX_URL = 'https://api.zoom.us/v2';
 
 const config: AxiosRequestConfig = {
-    headers: { 'Authorization': `Bearer ${ZOOM_TOKEN}` }
+    headers: {'Authorization': `Bearer ${ZOOM_TOKEN}`}
 }
 
 export async function getMeeting(meetingId?: string) {
@@ -28,6 +29,7 @@ export async function getMeetings() {
     try {
         const resp = await axios.get(`${PREFIX_URL}/report/users/${userId}/meetings`, config)
         const data = await resp.data;
+
         if (data['meetings'] && Array.isArray(data.meetings)) {
             meetings = data.meetings;
         }
@@ -37,7 +39,7 @@ export async function getMeetings() {
     return meetings;
 }
 
-export async function getMeetingParticipants(meetingId?: string) {
+export async function getMeetingParticipants(meetingId?: string): Promise<Array<ParticipantModelI>> {
     meetingId ??= '82539881248';
     let participants = new Array<ZoomParticipant>();
 
@@ -50,5 +52,5 @@ export async function getMeetingParticipants(meetingId?: string) {
         console.log(error);
     }
 
-    return participants;
+    return participants.map(parseToParticipantModelI);
 }

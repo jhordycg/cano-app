@@ -4,6 +4,7 @@ export interface ZoomMeeting {
     user_name: string;
     user_email: string;
     duration: number;
+    from: Date;
     total_minutes: number;
 }
 

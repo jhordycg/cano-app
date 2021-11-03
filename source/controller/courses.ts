@@ -1,8 +1,24 @@
-import { Request, Response, NextFunction } from 'express';
-import { getMeeting, getMeetingParticipants, getMeetings } from '../backend/courses';
-import { ZoomParticipant } from '../class/ZoomMeeting';
-import { Action, Card, CardHeader, CardSection, DecoratedText, FormResponse, Grid, GridBorderStyle, GridBorderStyleType, GridItem, HorizontalAlignment, Navigation, OnClick, Render, RenderAction, Widget } from '../components/view';
-import { getParams, hasParams, mergeStudents } from '../services/utility';
+import {NextFunction, Request, Response} from 'express';
+import {getMeeting, getMeetingParticipants, getMeetings} from '../backend/courses';
+import {
+    Action,
+    Card,
+    CardSection,
+    DecoratedText,
+    FormResponse,
+    Grid,
+    GridBorderStyle,
+    GridBorderStyleType,
+    GridItem,
+    HorizontalAlignment,
+    Navigation,
+    OnClick,
+    Render,
+    RenderAction,
+    Widget
+} from '../components/view';
+import {getParams, hasParams, mergeStudents} from '../services/utility';
+import {ParticipantModelI} from "../backend/db.model";
 
 async function sessions(req: Request, res: Response, next: NextFunction) {
     let params = hasParams(req) ? getParams(req) : null;
@@ -62,6 +78,7 @@ async function sessions(req: Request, res: Response, next: NextFunction) {
         );
     }
 }
+
 async function participants(req: Request, res: Response, next: NextFunction) {
     let params;
     let duration = 0;
@@ -81,7 +98,7 @@ async function participants(req: Request, res: Response, next: NextFunction) {
     }
 
     const widgets: Array<Widget> = mergeStudents(zoomParticipants)
-        .sort().map((item: ZoomParticipant) => {
+        .sort().map((item: ParticipantModelI) => {
             if (item.duration > duration) duration = item.duration;
             return Widget.builder().setDecoratedText(
                 DecoratedText.builder()
@@ -110,4 +127,4 @@ async function home(req: Request, res: Response, next: NextFunction) {
     return res.status(200).json("hola");
 }
 
-export default { home, sessions, participants };
+export default {home, sessions, participants};
